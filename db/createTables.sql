@@ -19,3 +19,27 @@ CREATE TABLE schedule(
         References barber (barberID) Match Simple
         On Update No Action On Delete No Action
 );
+
+create table client(
+    clientID            serial          Primary Key,
+    fullName            varchar(30)     not null,
+    gender              boolean,
+    phoneNumber         varchar(15)     unique not null,
+    userName            varchar(30)     not null,
+    hashedPassword      varchar         not null
+);
+
+create table review(
+    reviewID            serial          Primary Key,
+    clientID            integer         not null,
+    barberID            integer         not null,
+    apptID              integer         not null,
+    comments            varchar(128)     not null,
+    rating              smallint        not null,
+
+    Constraint review_clientID_barberID_apptID_fkey 
+        Foreign Key (barberID) (clientID) (apptID)
+        References barber (barberID) client (clientID) appointment (apptID)
+        Match Simple
+        On Update No Action On Delete No Action
+);
