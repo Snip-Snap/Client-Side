@@ -33,13 +33,25 @@ create table review(
     reviewID            serial          Primary Key,
     clientID            integer         not null,
     barberID            integer         not null,
-    apptID              integer         not null,
+    --apptID              integer         not null,
     comments            varchar(128)     not null,
     rating              smallint        not null,
 
-    Constraint review_clientID_barberID_apptID_fkey 
-        Foreign Key (barberID) (clientID) (apptID)
-        References barber (barberID) client (clientID) appointment (apptID)
+    Constraint review_clientID_fkey 
+        Foreign Key (clientID) 
+        References  client (clientID)
+        Match Simple
+        On Update No Action On Delete No Action,
+
+    Constraint review_barberID_fkey 
+        Foreign Key (barberID) 
+        References  barber (barberID)
         Match Simple
         On Update No Action On Delete No Action
+
+    -- Constraint review_apptID_fkey 
+    --     Foreign Key (apptID) 
+    --     References  appointment (apptID)
+    --     Match Simple
+    --     On Update No Action On Delete No Action
 );
