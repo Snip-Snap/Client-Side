@@ -29,6 +29,20 @@ create table client(
     hashedPassword      varchar         not null
 );
 
+create table cut(
+    cutID            serial          Primary Key,
+    hairCutStyle     varchar(30),
+    cost             integer       not null,
+    defaulDuration   integer       not null,
+    customDuration   integer       not null
+);
+create table appointment(
+    apptID            serial          Primary Key,
+    startTime         time         not null,
+    isCancelled       boolean        not null,
+    paymentType       varchar(30)    not null,
+    apptDate          date           not null
+);
 create table review(
     reviewID            serial          Primary Key,
     clientID            integer         not null,
