@@ -30,16 +30,13 @@ create table client(
 );
 create table cut(
     cutID            serial          Primary Key,
-    apptID           integer         not null,
     hairCutStyle     varchar(30),
-    cost             integer       not null,
-    defaulDuration   integer       not null,
-    customDuration   integer       not null,
+    cost             integer         not null,
+    defaulDuration   integer         not null,
+    customDuration   integer         not null
     
-    Constraint cut_apptID_fkey Foreign Key (apptID)
-        References appointment (apptID) Match Simple
-        On Update No Action On Delete No Action
 );
+
 create table appointment(
     apptID            serial         Primary Key,
     clientID          integer        not null,
@@ -62,6 +59,8 @@ create table appointment(
         References barber (barberID) Match Simple
         On Update No Action On Delete No Action
 );
+
+
 create table review(
     reviewID            serial          Primary Key,
     clientID            integer         not null,
