@@ -28,26 +28,39 @@ create table client(
     userName            varchar(30)     not null,
     hashedPassword      varchar         not null
 );
---YEEET
 create table cut(
     cutID            serial          Primary Key,
+    apptID           integer         not null,
     hairCutStyle     varchar(30),
     cost             integer       not null,
     defaulDuration   integer       not null,
     customDuration   integer       not null
+    
+    Constraint cut_apptID_fkey Foreign Key (apptID)
+        References appointment (apptID) Match Simple
+        On Update No Action On Delete No Action
 );
 create table appointment(
     apptID            serial          Primary Key,
+    clientID          integer         not null,
+    cutID             integer         not null,
     startTime         time         not null,
     isCancelled       boolean        not null,
     paymentType       varchar(30)    not null,
     apptDate          date           not null
+    
+    Constraint appointment_clientID_fkey Foreign Key (clientID)
+        References client (clientID) Match Simple
+        On Update No Action On Delete No Action
+    Constraint appointment_cutID_fkey Foreign Key (cutID)
+        References cut (cutID) Match Simple
+        On Update No Action On Delete No Action
 );
 create table review(
     reviewID            serial          Primary Key,
     clientID            integer         not null,
     barberID            integer         not null,
-    --apptID              integer         not null,
+    apptID              integer         not null,
     comments            varchar(128)     not null,
     rating              smallint        not null,
 
@@ -63,9 +76,9 @@ create table review(
         Match Simple
         On Update No Action On Delete No Action
 
-    -- Constraint review_apptID_fkey 
-    --     Foreign Key (apptID) 
-    --     References  appointment (apptID)
-    --     Match Simple
-    --     On Update No Action On Delete No Action
+     Constraint review_apptID_fkey 
+         Foreign Key (apptID) 
+         References  appointment (apptID)
+         Match Simple
+         On Update No Action On Delete No Action
 );
