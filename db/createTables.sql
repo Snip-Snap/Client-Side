@@ -28,7 +28,7 @@ create table client(
     userName            varchar(30)     not null,
     hashedPassword      varchar         not null
 );
-
+--YEEET
 create table cut(
     cutID            serial          Primary Key,
     hairCutStyle     varchar(30),
