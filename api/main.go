@@ -1,14 +1,15 @@
 package main
 
-import(
-	"fmt"
+import (
 	"database/sql"
 )
 
-var (
-	db *sql.DB
-)
+func main() {
+	var db *sql.DB
 
-func main()  {
-	fmt.Println("here");
+	db = connectPSQL()
+	//this function runs at the end of the scope
+	defer db.Close()
+
+	//write code for graphql schema
 }
