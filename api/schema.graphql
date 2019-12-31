@@ -1,0 +1,30 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Client {
+  clientID:       ID!
+  userName:       String!
+  password:       String!
+  fullName:       String!
+  gender:         Boolean
+  phoneNumber:    String!
+
+}
+
+input NewClient {
+  userName:       String!
+  password:       String!
+  fullName:       String!
+  gender:         Boolean
+  phoneNumber:    String!
+}
+
+type Query {
+  clients: [Client!]!
+}
+
+type Mutation {
+  # Client is return type. Will need to be changed in future. Return hashtoken?
+  signupClient(input: NewClient!) : Client
+}
