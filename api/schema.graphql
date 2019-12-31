@@ -28,3 +28,27 @@ type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Client
 }
+type Barber{
+  barberID:     ID!
+  userName:     String!
+  password:     String!
+  fullName:     String!
+  gender:       Boolean
+  PhoneNumber:  String!
+}
+type Query{
+  barbers: [Barber!]!
+}
+
+input NewBarber{
+  userName:     String!
+  password:     String!
+  fullName:     String!
+  gender:       Boolean!
+  PhoneNumber:  String!
+}
+
+type Mutation{
+  signUpBarber(input: NewBarber!): Barber
+}
+
