@@ -3,8 +3,6 @@ package graphqltest
 import (
 	"context"
 
-	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
 ) // THIS CODE IS A STARTING POINT ONLY. IT WILL NOT BE UPDATED WITH SCHEMA CHANGES.
 
@@ -24,20 +22,17 @@ func (r *mutationResolver) SignupClient(ctx context.Context,
 	statement, err := db.Prepare("insert into client, (fullname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5)")
 	CheckError(err)
 
-	//hash password
-	//check inputs: phone# (unique)
-	pw := string(input.Password)
-	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	//TODO: Check inputs for uniqueness and appropriate characters.
+	// pw := string(input.Password)
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password),
+		bcrypt.DefaultCost)
 	CheckError(err)
 
-	hashinputpass := string(hash)
-	sum, err := statement.Exec(input.FullName,
-		input.Gender, input.PhoneNumber, input.UserName, hashinputpass)
+	hashedInputpw := string(hash)
+	_, err = statement.Exec(input.FullName,
+		input.Gender, input.PhoneNumber, input.UserName, hashedInputpw)
 	CheckError(err)
-	client := &Client{string(0), input.UserName,
-		hashinputpass, input.FullName, input.Gender, input.PhoneNumber}
-	fmt.Printf("%v+", sum)
-	fmt.Printf("%v", client)
+
 	res := &Response{Error: "Okay"}
 
 	return res, nil
