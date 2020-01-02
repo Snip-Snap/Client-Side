@@ -2,6 +2,18 @@
 #
 # https://gqlgen.com/getting-started/
 
+type Mutation {
+  # Client is return type. Will need to be changed in future. Return hashtoken?
+  signupClient(input: NewClient!) : Response
+  signUpBarber(input: NewBarber!): Response
+}
+type Query{
+  response: Response
+}
+type Response{
+  error:          String!
+}
+
 type Client {
   clientID:       ID!
   userName:       String!
@@ -20,11 +32,19 @@ input NewClient {
   phoneNumber:    String!
 }
 
-type Query {
-  clients: [Client!]!
+type Barber{
+  barberID:     ID!
+  userName:     String!
+  password:     String!
+  fullName:     String!
+  gender:       Boolean
+  PhoneNumber:  String!
 }
 
-type Mutation {
-  # Client is return type. Will need to be changed in future. Return hashtoken?
-  signupClient(input: NewClient!) : Client
+input NewBarber{
+  userName:     String!
+  password:     String!
+  fullName:     String!
+  gender:       Boolean!
+  PhoneNumber:  String!
 }
