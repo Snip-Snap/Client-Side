@@ -19,29 +19,28 @@ func (r *Resolver) Query() QueryResolver {
 
 type mutationResolver struct{ *Resolver }
 
-func (r *mutationResolver) SignupClient(ctx context.Context, input NewClient) (*Client, error) {
-	//input.FullName
-	statement, err := db.Prepare("insert into client (fullname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5)")
-	if err != nil {
-		return nil, err
-	}
+func (r *mutationResolver) SignupClient(ctx context.Context,
+	input NewClient) (*Client, error) {
+	statement, err := db.Prepare("insert into client, (fullname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5)")
+	CheckError(err)
+
 	//hash password
-	//check inputs: phone# (unique),
+	//check inputs: phone# (unique)
 	pw := string(input.Password)
 	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
+	CheckError(err)
+
 	hashinputpass := string(hash)
-	sum, err := statement.Exec(input.FullName, input.Gender, input.PhoneNumber, input.UserName, hashinputpass)
-	if err != nil {
-		return nil, err
-	}
+	sum, err := statement.Exec(input.FullName,
+		input.Gender, input.PhoneNumber, input.UserName, hashinputpass)
+	CheckError(err)
 	// idVal, err := sum.LastInsertId()
 	// if err != nil {
 	// 	return nil, err
 	// }
-	client := &Client{string(0), input.UserName, hashinputpass, input.FullName, input.Gender, input.PhoneNumber}
+	// string(0) is placeholder
+	client := &Client{string(0), input.UserName,
+		hashinputpass, input.FullName, input.Gender, input.PhoneNumber}
 	fmt.Printf("%v+", sum)
 
 	return client, nil
@@ -52,9 +51,7 @@ type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Clients(ctx context.Context) ([]*Client, error) {
 	rows, err := db.Query("Select * from client")
-	if err != nil {
-		return nil, err
-	}
+	CheckError(err)
 
 	clients := []*Client{}
 
@@ -63,9 +60,7 @@ func (r *queryResolver) Clients(ctx context.Context) ([]*Client, error) {
 		client := &Client{}
 		err := rows.Scan(&client.ClientID, &client.FullName, &client.Gender,
 			&client.PhoneNumber, &client.UserName, &client.Password)
-		if err != nil {
-			return nil, err
-		}
+		CheckError(err)
 		fmt.Printf("%+v", client)
 		clients = append(clients, client)
 	}
