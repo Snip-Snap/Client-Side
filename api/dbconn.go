@@ -26,7 +26,9 @@ func parseCreds(fn string) string {
 
 func ConnectPSQL() {
 
-	creds := parseCreds("../../dbcreds.config")
+	creds := parseCreds("/run/secrets")
+//	creds := parseCreds("../../dbcreds.config")
+
 	var err error
 
 	db, err = sql.Open("postgres", creds)

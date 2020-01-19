@@ -1,0 +1,18 @@
+version: '3.3'
+
+services:
+    gql-api:
+        build: ./api
+        #these files are mounted inside 
+        #the docker container 
+        volumes: 
+            #changes in local files are reflected 
+            #in the container
+            - ./api:/app
+            #look into swarming for /run/secrets
+            - ./../dbcreds.config:/run/secrets
+        ports:
+            - 8080:8080
+
+#run with docker-compose up -d
+#to start api in the background of docker
