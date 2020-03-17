@@ -27,6 +27,7 @@ func parseCreds(fn string) string {
 func ConnectPSQL() {
 
 	creds := parseCreds("/run/secrets")
+	//code when you run manually without docker
 //	creds := parseCreds("../../dbcreds.config")
 
 	var err error
