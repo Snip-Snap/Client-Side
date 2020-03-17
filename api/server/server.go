@@ -17,7 +17,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-
+	print("connecting to psql")
 	gql.ConnectPSQL()
 	defer gql.ClosePSQL()
 

@@ -32,6 +32,7 @@ func ConnectPSQL() {
 	var err error
 
 	db, err = sql.Open("postgres", creds)
+	print("connect psql")
 	CheckError(err)
 }
 
