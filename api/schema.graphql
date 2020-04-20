@@ -1,50 +1,62 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
 
 type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Response
   signUpBarber(input: NewBarber!): Response
+  login(input: Login!): Response
 }
 type Query{
   response: Response
+  clients: [Client!]!
 }
 type Response{
-  error:          String!
+  error: String!
+}
+
+input Login{
+  userName: String!
+  password: String!
+}
+
+input NewBarber{
+  userName:     String!
+  password:     String!
+  firstName:    String!
+  lastName:     String!
+  gender:       Boolean!
+  PhoneNumber:  String!
+}
+
+input NewClient {
+  userName:       String!
+  password:       String!
+  firstName:      String!
+  lastName:       String!
+  gender:         String
+  phoneNumber:    String!
 }
 
 type Client {
   clientID:       ID!
   userName:       String!
   password:       String!
-  fullName:       String!
-  gender:         Boolean
+  firstName:      String!
+  lastName:       String!
   phoneNumber:    String!
-
+  gender:         String
 }
 
-input NewClient {
-  userName:       String!
-  password:       String!
-  fullName:       String!
-  gender:         Boolean
-  phoneNumber:    String!
-}
-
+# hireDate and dismissDate type may need to be modified
 type Barber{
   barberID:     ID!
+  shopID:       Int!
   userName:     String!
   password:     String!
-  fullName:     String!
+  firstName:    String!
+  lastName:     String!
+  PhoneNumber:  String!
   gender:       Boolean
-  PhoneNumber:  String!
-}
-
-input NewBarber{
-  userName:     String!
-  password:     String!
-  fullName:     String!
-  gender:       Boolean!
-  PhoneNumber:  String!
+  hireDate:     String!
+  dismissDate:  String
+  seatNum:      Int!
 }
