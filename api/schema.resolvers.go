@@ -30,26 +30,6 @@ func (r *mutationResolver) SignupClient(ctx context.Context, input model.NewClie
 	return res, nil
 }
 
-func (r *mutationResolver) SignUpBarber(ctx context.Context, input model.NewBarber) (*model.Response, error) {
-	stmt, err := db.Prepare("insert into barber (firstname, lastname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5, $6)")
-	if err != nil {
-		return nil, err
-	}
-
-	hashpw, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = stmt.Exec(input.FirstName, input.LastName, input.Gender, input.PhoneNumber, input.UserName, string(hashpw))
-	if err != nil {
-		return nil, err
-	}
-	res := &model.Response{Error: "Okay"}
-
-	return res, nil
-}
-
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Response, error) {
 	stmt, err := db.Prepare("select password from client where username=$1")
 	if dbError(err) {
@@ -108,3 +88,4 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+

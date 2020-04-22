@@ -2,20 +2,6 @@
 
 package model
 
-type Barber struct {
-	BarberID    string  `json:"barberID"`
-	ShopID      int     `json:"shopID"`
-	UserName    string  `json:"userName"`
-	Password    string  `json:"password"`
-	FirstName   string  `json:"firstName"`
-	LastName    string  `json:"lastName"`
-	PhoneNumber string  `json:"PhoneNumber"`
-	Gender      *bool   `json:"gender"`
-	HireDate    string  `json:"hireDate"`
-	DismissDate *string `json:"dismissDate"`
-	SeatNum     int     `json:"seatNum"`
-}
-
 type Client struct {
 	ClientID    string  `json:"clientID"`
 	UserName    string  `json:"userName"`
@@ -29,15 +15,6 @@ type Client struct {
 type Login struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
-}
-
-type NewBarber struct {
-	UserName    string `json:"userName"`
-	Password    string `json:"password"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Gender      bool   `json:"gender"`
-	PhoneNumber string `json:"PhoneNumber"`
 }
 
 type NewClient struct {

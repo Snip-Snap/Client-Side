@@ -2,7 +2,6 @@
 type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Response
-  signUpBarber(input: NewBarber!): Response
   login(input: Login!): Response
 }
 type Query{
@@ -18,14 +17,7 @@ input Login{
   password: String!
 }
 
-input NewBarber{
-  userName:     String!
-  password:     String!
-  firstName:    String!
-  lastName:     String!
-  gender:       Boolean!
-  PhoneNumber:  String!
-}
+
 
 input NewClient {
   userName:       String!
@@ -46,17 +38,3 @@ type Client {
   gender:         String
 }
 
-# hireDate and dismissDate type may need to be modified
-type Barber{
-  barberID:     ID!
-  shopID:       Int!
-  userName:     String!
-  password:     String!
-  firstName:    String!
-  lastName:     String!
-  PhoneNumber:  String!
-  gender:       Boolean
-  hireDate:     String!
-  dismissDate:  String
-  seatNum:      Int!
-}

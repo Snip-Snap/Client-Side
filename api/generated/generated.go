@@ -43,20 +43,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	Barber struct {
-		BarberID    func(childComplexity int) int
-		DismissDate func(childComplexity int) int
-		FirstName   func(childComplexity int) int
-		Gender      func(childComplexity int) int
-		HireDate    func(childComplexity int) int
-		LastName    func(childComplexity int) int
-		Password    func(childComplexity int) int
-		PhoneNumber func(childComplexity int) int
-		SeatNum     func(childComplexity int) int
-		ShopID      func(childComplexity int) int
-		UserName    func(childComplexity int) int
-	}
-
 	Client struct {
 		ClientID    func(childComplexity int) int
 		FirstName   func(childComplexity int) int
@@ -69,7 +55,6 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		Login        func(childComplexity int, input model.Login) int
-		SignUpBarber func(childComplexity int, input model.NewBarber) int
 		SignupClient func(childComplexity int, input model.NewClient) int
 	}
 
@@ -85,7 +70,6 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	SignupClient(ctx context.Context, input model.NewClient) (*model.Response, error)
-	SignUpBarber(ctx context.Context, input model.NewBarber) (*model.Response, error)
 	Login(ctx context.Context, input model.Login) (*model.Response, error)
 }
 type QueryResolver interface {
@@ -107,83 +91,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
-
-	case "Barber.barberID":
-		if e.complexity.Barber.BarberID == nil {
-			break
-		}
-
-		return e.complexity.Barber.BarberID(childComplexity), true
-
-	case "Barber.dismissDate":
-		if e.complexity.Barber.DismissDate == nil {
-			break
-		}
-
-		return e.complexity.Barber.DismissDate(childComplexity), true
-
-	case "Barber.firstName":
-		if e.complexity.Barber.FirstName == nil {
-			break
-		}
-
-		return e.complexity.Barber.FirstName(childComplexity), true
-
-	case "Barber.gender":
-		if e.complexity.Barber.Gender == nil {
-			break
-		}
-
-		return e.complexity.Barber.Gender(childComplexity), true
-
-	case "Barber.hireDate":
-		if e.complexity.Barber.HireDate == nil {
-			break
-		}
-
-		return e.complexity.Barber.HireDate(childComplexity), true
-
-	case "Barber.lastName":
-		if e.complexity.Barber.LastName == nil {
-			break
-		}
-
-		return e.complexity.Barber.LastName(childComplexity), true
-
-	case "Barber.password":
-		if e.complexity.Barber.Password == nil {
-			break
-		}
-
-		return e.complexity.Barber.Password(childComplexity), true
-
-	case "Barber.PhoneNumber":
-		if e.complexity.Barber.PhoneNumber == nil {
-			break
-		}
-
-		return e.complexity.Barber.PhoneNumber(childComplexity), true
-
-	case "Barber.seatNum":
-		if e.complexity.Barber.SeatNum == nil {
-			break
-		}
-
-		return e.complexity.Barber.SeatNum(childComplexity), true
-
-	case "Barber.shopID":
-		if e.complexity.Barber.ShopID == nil {
-			break
-		}
-
-		return e.complexity.Barber.ShopID(childComplexity), true
-
-	case "Barber.userName":
-		if e.complexity.Barber.UserName == nil {
-			break
-		}
-
-		return e.complexity.Barber.UserName(childComplexity), true
 
 	case "Client.clientID":
 		if e.complexity.Client.ClientID == nil {
@@ -245,18 +152,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
-
-	case "Mutation.signUpBarber":
-		if e.complexity.Mutation.SignUpBarber == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_signUpBarber_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SignUpBarber(childComplexity, args["input"].(model.NewBarber)), true
 
 	case "Mutation.signupClient":
 		if e.complexity.Mutation.SignupClient == nil {
@@ -359,7 +254,6 @@ var sources = []*ast.Source{
 type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Response
-  signUpBarber(input: NewBarber!): Response
   login(input: Login!): Response
 }
 type Query{
@@ -375,14 +269,7 @@ input Login{
   password: String!
 }
 
-input NewBarber{
-  userName:     String!
-  password:     String!
-  firstName:    String!
-  lastName:     String!
-  gender:       Boolean!
-  PhoneNumber:  String!
-}
+
 
 input NewClient {
   userName:       String!
@@ -403,20 +290,7 @@ type Client {
   gender:         String
 }
 
-# hireDate and dismissDate type may need to be modified
-type Barber{
-  barberID:     ID!
-  shopID:       Int!
-  userName:     String!
-  password:     String!
-  firstName:    String!
-  lastName:     String!
-  PhoneNumber:  String!
-  gender:       Boolean
-  hireDate:     String!
-  dismissDate:  String
-  seatNum:      Int!
-}`, BuiltIn: false},
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -430,20 +304,6 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	var arg0 model.Login
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNLogin2apiᚋmodelᚐLogin(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_signUpBarber_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewBarber
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNewBarber2apiᚋmodelᚐNewBarber(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -515,374 +375,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _Barber_barberID(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BarberID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_shopID(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ShopID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_userName(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UserName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_password(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Password, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_firstName(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FirstName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_lastName(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.LastName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_PhoneNumber(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PhoneNumber, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_gender(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Gender, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*bool)
-	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_hireDate(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HireDate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_dismissDate(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DismissDate, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Barber_seatNum(ctx context.Context, field graphql.CollectedField, obj *model.Barber) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Barber",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.SeatNum, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
 
 func (ec *executionContext) _Client_clientID(ctx context.Context, field graphql.CollectedField, obj *model.Client) (ret graphql.Marshaler) {
 	defer func() {
@@ -1144,44 +636,6 @@ func (ec *executionContext) _Mutation_signupClient(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().SignupClient(rctx, args["input"].(model.NewClient))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.Response)
-	fc.Result = res
-	return ec.marshalOResponse2ᚖapiᚋmodelᚐResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_signUpBarber(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_signUpBarber_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SignUpBarber(rctx, args["input"].(model.NewBarber))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2480,54 +1934,6 @@ func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interfa
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewBarber(ctx context.Context, obj interface{}) (model.NewBarber, error) {
-	var it model.NewBarber
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "userName":
-			var err error
-			it.UserName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "password":
-			var err error
-			it.Password, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "firstName":
-			var err error
-			it.FirstName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "lastName":
-			var err error
-			it.LastName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "gender":
-			var err error
-			it.Gender, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "PhoneNumber":
-			var err error
-			it.PhoneNumber, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewClient(ctx context.Context, obj interface{}) (model.NewClient, error) {
 	var it model.NewClient
 	var asMap = obj.(map[string]interface{})
@@ -2583,77 +1989,6 @@ func (ec *executionContext) unmarshalInputNewClient(ctx context.Context, obj int
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
-
-var barberImplementors = []string{"Barber"}
-
-func (ec *executionContext) _Barber(ctx context.Context, sel ast.SelectionSet, obj *model.Barber) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, barberImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Barber")
-		case "barberID":
-			out.Values[i] = ec._Barber_barberID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "shopID":
-			out.Values[i] = ec._Barber_shopID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "userName":
-			out.Values[i] = ec._Barber_userName(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "password":
-			out.Values[i] = ec._Barber_password(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "firstName":
-			out.Values[i] = ec._Barber_firstName(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "lastName":
-			out.Values[i] = ec._Barber_lastName(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "PhoneNumber":
-			out.Values[i] = ec._Barber_PhoneNumber(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "gender":
-			out.Values[i] = ec._Barber_gender(ctx, field, obj)
-		case "hireDate":
-			out.Values[i] = ec._Barber_hireDate(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "dismissDate":
-			out.Values[i] = ec._Barber_dismissDate(ctx, field, obj)
-		case "seatNum":
-			out.Values[i] = ec._Barber_seatNum(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
 
 var clientImplementors = []string{"Client"}
 
@@ -2726,8 +2061,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "signupClient":
 			out.Values[i] = ec._Mutation_signupClient(ctx, field)
-		case "signUpBarber":
-			out.Values[i] = ec._Mutation_signUpBarber(ctx, field)
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
 		default:
@@ -3147,26 +2480,8 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
-	return graphql.UnmarshalInt(v)
-}
-
-func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalInt(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) unmarshalNLogin2apiᚋmodelᚐLogin(ctx context.Context, v interface{}) (model.Login, error) {
 	return ec.unmarshalInputLogin(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNNewBarber2apiᚋmodelᚐNewBarber(ctx context.Context, v interface{}) (model.NewBarber, error) {
-	return ec.unmarshalInputNewBarber(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewClient2apiᚋmodelᚐNewClient(ctx context.Context, v interface{}) (model.NewClient, error) {
