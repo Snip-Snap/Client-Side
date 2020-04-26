@@ -31,12 +31,12 @@ func (r *mutationResolver) SignupClient(ctx context.Context, input model.NewClie
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Response, error) {
-	stmt, err := db.Prepare("select password from client where username=$1")
+	stmt, err := db.Prepare("select hashedpassword from client where username=$1")
 	if dbError(err) {
 		return nil, err
 	}
 	var cli_pass string
-	err = stmt.QueryRow(input.Password).Scan(&cli_pass)
+	err = stmt.QueryRow(input.UserName).Scan(&cli_pass)
 	if dbError(err) {
 		return nil, err
 	}
