@@ -9,6 +9,7 @@ type Query{
   clients: [Client!]!
 }
 type Response{
+  token: String!
   error: String!
 }
 

@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+var DB *sql.DB
 
 func parseCreds(fn string) string {
 	infile, err := os.Open(fn)
@@ -28,15 +28,14 @@ func ConnectPSQL() {
 
 	creds := parseCreds("/run/secrets")
 	//code when you run manually without docker
-//	creds := parseCreds("../../dbcreds.config")
+	//creds := parseCreds("../../dbcreds.config")
 
 	var err error
 
-	db, err = sql.Open("postgres", creds)
-	print("connect psql")
+	DB, err = sql.Open("postgres", creds)
 	CheckError(err)
 }
 
 func ClosePSQL() {
-	db.Close()
+	DB.Close()
 }

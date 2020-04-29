@@ -4,15 +4,18 @@ package api
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
+	"api/auth"
 	"api/generated"
+	"api/jwtoken"
 	"api/model"
 	"context"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (r *mutationResolver) SignupClient(ctx context.Context, input model.NewClient) (*model.Response, error) {
-	statement, err := db.Prepare("insert into client (firstname, lastname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5, $6)")
+	statement, err := DB.Prepare("insert into client (firstname, lastname, gender, phonenumber, username, hashedpassword) values($1, $2, $3, $4, $5, $6)")
 	CheckError(err)
 	//TODO: Check inputs for uniqueness and appropriate characters.
 	// pw := string(input.Password)
@@ -31,7 +34,7 @@ func (r *mutationResolver) SignupClient(ctx context.Context, input model.NewClie
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model.Response, error) {
-	stmt, err := db.Prepare("select hashedpassword from client where username=$1")
+	stmt, err := DB.Prepare("select hashedpassword from client where username=$1")
 	if dbError(err) {
 		return nil, err
 	}
@@ -43,20 +46,32 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 
 	err = bcrypt.CompareHashAndPassword([]byte(cli_pass), []byte(input.Password))
 
-	if dbError(err) {
-		return &model.Response{Error: "Wrong username or password"}, nil
-	} else {
-		return &model.Response{Error: "Okay"}, nil
+	if !dbError(err) {
+		gentoken, err := jwtoken.GenerateToken(input.UserName)
+		if err != nil {
+			return nil, err
+		}
+
+		return &model.Response{Token: gentoken, Error: "Okay"}, nil
 	}
+
+	return &model.Response{Token: "", Error: "Wrong username or password"}, nil
+
 }
 
 func (r *queryResolver) Response(ctx context.Context) (*model.Response, error) {
-	res := &model.Response{Error: "nothing here"}
+	res := &model.Response{Token: "", Error: "nothing here"}
 	return res, nil
 }
 
 func (r *queryResolver) Clients(ctx context.Context) ([]*model.Client, error) {
-	rows, err := db.Query("select * from client")
+	user := auth.ForContext(ctx)
+
+	if user == "" {
+		return nil, fmt.Errorf("access denied")
+	}
+
+	rows, err := DB.Query("select * from client")
 
 	if dbError(err) {
 		return nil, err
@@ -88,4 +103,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
