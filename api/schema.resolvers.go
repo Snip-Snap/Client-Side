@@ -8,6 +8,7 @@ import (
 	"api/jwtoken"
 	"api/model"
 	"context"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -26,7 +27,11 @@ func (r *mutationResolver) SignupClient(ctx context.Context, input model.NewClie
 		input.Gender, input.PhoneNumber, input.UserName, hashedInputpw)
 	CheckError(err)
 
-	res := &model.Response{Error: "Okay"}
+	token, err := jwtoken.GenerateToken(input.UserName)
+	if err != nil {
+		return nil, err
+	}
+	res := &model.Response{Token: token}
 
 	return res, nil
 }
@@ -49,19 +54,25 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 			return nil, err
 		}
 
-		return &model.Response{Token: gentoken, Error: "Okay"}, nil
+		return &model.Response{Token: gentoken}, nil
 	}
 
-	return &model.Response{Token: "", Error: "Wrong username or password"}, nil
+	return &model.Response{Token: ""}, fmt.Errorf("Wrong username or password!")
 }
 
-func (r *queryResolver) Response(ctx context.Context) (*model.Response, error) {
-	res := &model.Response{Token: "", Error: "nothing here"}
-	return res, nil
+func (r *queryResolver) RefreshToken(ctx context.Context, input model.Oldtoken) (*model.Response, error) {
+	username, err := jwtoken.VerifyToken(input.Token)
+	if err != nil {
+		return nil, err
+	}
+	token, err := jwtoken.GenerateToken(username)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Response{Token: token}, nil
 }
 
 func (r *queryResolver) Clients(ctx context.Context) ([]*model.Client, error) {
-
 	rows, err := DB.Query("select * from client")
 
 	if dbError(err) {

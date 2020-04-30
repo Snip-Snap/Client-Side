@@ -26,7 +26,10 @@ type NewClient struct {
 	PhoneNumber string  `json:"phoneNumber"`
 }
 
+type Oldtoken struct {
+	Token string `json:"token"`
+}
+
 type Response struct {
 	Token string `json:"token"`
-	Error string `json:"error"`
 }

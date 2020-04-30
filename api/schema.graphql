@@ -5,16 +5,23 @@ type Mutation {
   login(input: Login!): Response
 }
 type Query{
-  response: Response
+  refreshToken(input: Oldtoken!): Response @isAuthenticated
   clients: [Client!]! @isAuthenticated
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
 
+
+
 type Response{
   token: String!
-  error: String!
 }
+
+
+input Oldtoken{
+  token: String!
+}
+
 
 input Login{
   userName: String!
