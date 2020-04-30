@@ -5,7 +5,7 @@ import (
 	"api"
 	"api/auth"
 	"api/generated"
-
+	"api/directive"
 	"net/http"
 	"os"
 
@@ -24,11 +24,15 @@ func main() {
 	print("connecting to psql")
 	api.ConnectPSQL()
 	defer api.ClosePSQL()
+
+	c := generated.Config{Resolvers: &api.Resolver{}}
+	directive.AddAuth(&c)
+
 	router := chi.NewRouter()
 
 	router.Use(auth.Middleware(api.DB))
-
-	srv := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &api.Resolver{}}))
+	srv := handler.GraphQL(generated.NewExecutableSchema(c))
+	//srv := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &api.Resolver{}}))
 	router.Handle("/", playground.Handler("Barbershop", "/query"))
 	router.Handle("/query", srv)
 

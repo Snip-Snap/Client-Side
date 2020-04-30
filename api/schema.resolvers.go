@@ -4,12 +4,10 @@ package api
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
-	"api/auth"
 	"api/generated"
 	"api/jwtoken"
 	"api/model"
 	"context"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -43,7 +41,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	if dbError(err) {
 		return nil, err
 	}
-
 	err = bcrypt.CompareHashAndPassword([]byte(cli_pass), []byte(input.Password))
 
 	if !dbError(err) {
@@ -56,7 +53,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	}
 
 	return &model.Response{Token: "", Error: "Wrong username or password"}, nil
-
 }
 
 func (r *queryResolver) Response(ctx context.Context) (*model.Response, error) {
@@ -65,11 +61,6 @@ func (r *queryResolver) Response(ctx context.Context) (*model.Response, error) {
 }
 
 func (r *queryResolver) Clients(ctx context.Context) ([]*model.Client, error) {
-	user := auth.ForContext(ctx)
-
-	if user == "" {
-		return nil, fmt.Errorf("access denied")
-	}
 
 	rows, err := DB.Query("select * from client")
 

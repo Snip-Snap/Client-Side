@@ -6,8 +6,11 @@ type Mutation {
 }
 type Query{
   response: Response
-  clients: [Client!]!
+  clients: [Client!]! @isAuthenticated
 }
+
+directive @isAuthenticated on FIELD_DEFINITION
+
 type Response{
   token: String!
   error: String!
