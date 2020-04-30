@@ -7,15 +7,10 @@ type Mutation {
 type Query{
   refreshToken(input: Oldtoken!): Response @isAuthenticated
   clients: [Client!]! @isAuthenticated
+  allshops: [Shop!]! @isAuthenticated
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
-
-
-
-type Response{
-  token: String!
-}
 
 
 input Oldtoken{
@@ -47,5 +42,18 @@ type Client {
   lastName:       String!
   phoneNumber:    String!
   gender:         String
+}
+
+type Response{
+  token: String!
+}
+
+type Shop{
+  shopID:       ID!
+  StreetAddr:   String!
+  City:         String!
+  State:        String!
+  AreaCode:     String!
+  Country:      String!
 }
 

@@ -33,3 +33,12 @@ type Oldtoken struct {
 type Response struct {
 	Token string `json:"token"`
 }
+
+type Shop struct {
+	ShopID     string `json:"shopID"`
+	StreetAddr string `json:"StreetAddr"`
+	City       string `json:"City"`
+	State      string `json:"State"`
+	AreaCode   string `json:"AreaCode"`
+	Country    string `json:"Country"`
+}
