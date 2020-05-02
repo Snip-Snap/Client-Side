@@ -75,6 +75,7 @@ type ComplexityRoot struct {
 		City       func(childComplexity int) int
 		Country    func(childComplexity int) int
 		ShopID     func(childComplexity int) int
+		ShopName   func(childComplexity int) int
 		State      func(childComplexity int) int
 		StreetAddr func(childComplexity int) int
 	}
@@ -239,6 +240,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Shop.ShopID(childComplexity), true
 
+	case "Shop.ShopName":
+		if e.complexity.Shop.ShopName == nil {
+			break
+		}
+
+		return e.complexity.Shop.ShopName(childComplexity), true
+
 	case "Shop.State":
 		if e.complexity.Shop.State == nil {
 			break
@@ -326,7 +334,7 @@ type Mutation {
 type Query{
   refreshToken(input: Oldtoken!): Response @isAuthenticated
   clients: [Client!]! @isAuthenticated
-  allshops: [Shop!]! @isAuthenticated
+  allshops: [Shop!]! 
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -369,6 +377,7 @@ type Response{
 
 type Shop{
   shopID:       ID!
+  ShopName:     String!
   StreetAddr:   String!
   City:         String!
   State:        String!
@@ -915,28 +924,8 @@ func (ec *executionContext) _Query_allshops(ctx context.Context, field graphql.C
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Allshops(rctx)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.IsAuthenticated == nil {
-				return nil, errors.New("directive isAuthenticated is not implemented")
-			}
-			return ec.directives.IsAuthenticated(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, err
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.([]*model.Shop); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*api/model.Shop`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Allshops(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1088,6 +1077,40 @@ func (ec *executionContext) _Shop_shopID(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Shop_ShopName(ctx context.Context, field graphql.CollectedField, obj *model.Shop) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Shop",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ShopName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Shop_StreetAddr(ctx context.Context, field graphql.CollectedField, obj *model.Shop) (ret graphql.Marshaler) {
@@ -2606,6 +2629,11 @@ func (ec *executionContext) _Shop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = graphql.MarshalString("Shop")
 		case "shopID":
 			out.Values[i] = ec._Shop_shopID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ShopName":
+			out.Values[i] = ec._Shop_ShopName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

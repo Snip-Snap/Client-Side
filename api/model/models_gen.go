@@ -36,6 +36,7 @@ type Response struct {
 
 type Shop struct {
 	ShopID     string `json:"shopID"`
+	ShopName   string `json:"ShopName"`
 	StreetAddr string `json:"StreetAddr"`
 	City       string `json:"City"`
 	State      string `json:"State"`

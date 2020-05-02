@@ -98,7 +98,6 @@ func (r *queryResolver) Clients(ctx context.Context) ([]*model.Client, error) {
 }
 
 func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
-
 	rows, err := DB.Query("select * from shop")
 
 	if dbError(err) {
@@ -111,7 +110,7 @@ func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
 	for rows.Next() {
 		shop := &model.Shop{}
 		err := rows.Scan(&shop.ShopID, &shop.StreetAddr, &shop.State,
-			&shop.AreaCode, &shop.City, &shop.Country)
+			&shop.AreaCode, &shop.City, &shop.Country, &shop.ShopName)
 
 		if dbError(err) {
 			return nil, err
@@ -120,7 +119,6 @@ func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
 		shops = append(shops, shop)
 	}
 	return shops, nil
-
 }
 
 // Mutation returns generated.MutationResolver implementation.

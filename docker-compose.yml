@@ -13,6 +13,7 @@ services:
             - ./../dbcreds.config:/run/secrets
         ports:
             - 8080:8080
+        env_file: "./../env-vars.env"
 
 #run with docker-compose up -d
 #to start api in the background of docker
