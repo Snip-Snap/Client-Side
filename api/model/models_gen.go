@@ -42,4 +42,6 @@ type Shop struct {
 	State      string `json:"State"`
 	AreaCode   string `json:"AreaCode"`
 	Country    string `json:"Country"`
+	Latitude   string `json:"Latitude"`
+	Longitude  string `json:"Longitude"`
 }

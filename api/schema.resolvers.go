@@ -110,7 +110,8 @@ func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
 	for rows.Next() {
 		shop := &model.Shop{}
 		err := rows.Scan(&shop.ShopID, &shop.StreetAddr, &shop.State,
-			&shop.AreaCode, &shop.City, &shop.Country, &shop.ShopName)
+			&shop.AreaCode, &shop.City, &shop.Country, &shop.ShopName,
+			&shop.Latitude, &shop.Longitude)
 
 		if dbError(err) {
 			return nil, err

@@ -56,5 +56,7 @@ type Shop{
   State:        String!
   AreaCode:     String!
   Country:      String!
+  Latitude:     String!
+  Longitude:    String!
 }
 

@@ -74,6 +74,8 @@ type ComplexityRoot struct {
 		AreaCode   func(childComplexity int) int
 		City       func(childComplexity int) int
 		Country    func(childComplexity int) int
+		Latitude   func(childComplexity int) int
+		Longitude  func(childComplexity int) int
 		ShopID     func(childComplexity int) int
 		ShopName   func(childComplexity int) int
 		State      func(childComplexity int) int
@@ -233,6 +235,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Shop.Country(childComplexity), true
 
+	case "Shop.Latitude":
+		if e.complexity.Shop.Latitude == nil {
+			break
+		}
+
+		return e.complexity.Shop.Latitude(childComplexity), true
+
+	case "Shop.Longitude":
+		if e.complexity.Shop.Longitude == nil {
+			break
+		}
+
+		return e.complexity.Shop.Longitude(childComplexity), true
+
 	case "Shop.shopID":
 		if e.complexity.Shop.ShopID == nil {
 			break
@@ -383,6 +399,8 @@ type Shop{
   State:        String!
   AreaCode:     String!
   Country:      String!
+  Latitude:     String!
+  Longitude:    String!
 }
 
 `, BuiltIn: false},
@@ -1267,6 +1285,74 @@ func (ec *executionContext) _Shop_Country(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Country, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Shop_Latitude(ctx context.Context, field graphql.CollectedField, obj *model.Shop) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Shop",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Latitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Shop_Longitude(ctx context.Context, field graphql.CollectedField, obj *model.Shop) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Shop",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Longitude, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2659,6 +2745,16 @@ func (ec *executionContext) _Shop(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "Country":
 			out.Values[i] = ec._Shop_Country(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Latitude":
+			out.Values[i] = ec._Shop_Latitude(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Longitude":
+			out.Values[i] = ec._Shop_Longitude(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
