@@ -76,6 +76,7 @@ type ComplexityRoot struct {
 		Country    func(childComplexity int) int
 		Latitude   func(childComplexity int) int
 		Longitude  func(childComplexity int) int
+		Rating     func(childComplexity int) int
 		ShopID     func(childComplexity int) int
 		ShopName   func(childComplexity int) int
 		State      func(childComplexity int) int
@@ -249,6 +250,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Shop.Longitude(childComplexity), true
 
+	case "Shop.Rating":
+		if e.complexity.Shop.Rating == nil {
+			break
+		}
+
+		return e.complexity.Shop.Rating(childComplexity), true
+
 	case "Shop.shopID":
 		if e.complexity.Shop.ShopID == nil {
 			break
@@ -401,6 +409,7 @@ type Shop{
   Country:      String!
   Latitude:     String!
   Longitude:    String!
+  Rating:       Float!
 }
 
 `, BuiltIn: false},
@@ -1367,6 +1376,40 @@ func (ec *executionContext) _Shop_Longitude(ctx context.Context, field graphql.C
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Shop_Rating(ctx context.Context, field graphql.CollectedField, obj *model.Shop) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Shop",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rating, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2758,6 +2801,11 @@ func (ec *executionContext) _Shop(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Rating":
+			out.Values[i] = ec._Shop_Rating(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3077,6 +3125,20 @@ func (ec *executionContext) marshalNClient2ᚖapiᚋmodelᚐClient(ctx context.C
 		return graphql.Null
 	}
 	return ec._Client(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloat(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {

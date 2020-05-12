@@ -35,13 +35,14 @@ type Response struct {
 }
 
 type Shop struct {
-	ShopID     string `json:"shopID"`
-	ShopName   string `json:"ShopName"`
-	StreetAddr string `json:"StreetAddr"`
-	City       string `json:"City"`
-	State      string `json:"State"`
-	AreaCode   string `json:"AreaCode"`
-	Country    string `json:"Country"`
-	Latitude   string `json:"Latitude"`
-	Longitude  string `json:"Longitude"`
+	ShopID     string  `json:"shopID"`
+	ShopName   string  `json:"ShopName"`
+	StreetAddr string  `json:"StreetAddr"`
+	City       string  `json:"City"`
+	State      string  `json:"State"`
+	AreaCode   string  `json:"AreaCode"`
+	Country    string  `json:"Country"`
+	Latitude   string  `json:"Latitude"`
+	Longitude  string  `json:"Longitude"`
+	Rating     float64 `json:"Rating"`
 }

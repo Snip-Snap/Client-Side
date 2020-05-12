@@ -98,7 +98,7 @@ func (r *queryResolver) Clients(ctx context.Context) ([]*model.Client, error) {
 }
 
 func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
-	rows, err := DB.Query("select * from shop")
+	rows, err := DB.Query("select * from shop_ratings")
 
 	if dbError(err) {
 		return nil, err
@@ -111,7 +111,7 @@ func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
 		shop := &model.Shop{}
 		err := rows.Scan(&shop.ShopID, &shop.StreetAddr, &shop.State,
 			&shop.AreaCode, &shop.City, &shop.Country, &shop.ShopName,
-			&shop.Latitude, &shop.Longitude)
+			&shop.Latitude, &shop.Longitude, &shop.Rating)
 
 		if dbError(err) {
 			return nil, err

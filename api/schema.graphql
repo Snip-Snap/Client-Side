@@ -58,5 +58,6 @@ type Shop{
   Country:      String!
   Latitude:     String!
   Longitude:    String!
+  Rating:       Float!
 }
 
