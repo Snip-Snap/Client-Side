@@ -122,6 +122,31 @@ func (r *queryResolver) Allshops(ctx context.Context) ([]*model.Shop, error) {
 	return shops, nil
 }
 
+func (r *queryResolver) Services(ctx context.Context) ([]*model.Service, error) {
+	rows, err := DB.Query("select * from service")
+
+	if dbError(err) {
+		return nil, err
+	}
+
+	services := []*model.Service{}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		service := &model.Service{}
+		err := rows.Scan(&service.ServiceID, &service.ServiceName,
+			&service.ServiceDescription, &service.Price,
+			&service.CustomDuration)
+
+		if dbError(err) {
+			return nil, err
+		}
+		services = append(services, service)
+	}
+	return services, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

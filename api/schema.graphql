@@ -8,6 +8,7 @@ type Query{
   refreshToken(input: Oldtoken!): Response @isAuthenticated
   clients: [Client!]! @isAuthenticated
   allshops: [Shop!]! 
+  services: [Service!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -59,5 +60,13 @@ type Shop{
   Latitude:     String!
   Longitude:    String!
   Rating:       Float!
+}
+
+type Service{
+  serviceID:            ID!
+  serviceName:          String!
+  serviceDescription:   String
+  price:                Float
+  customDuration:       Int!
 }
 

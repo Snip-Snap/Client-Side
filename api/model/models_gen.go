@@ -34,6 +34,14 @@ type Response struct {
 	Token string `json:"token"`
 }
 
+type Service struct {
+	ServiceID          string   `json:"serviceID"`
+	ServiceName        string   `json:"serviceName"`
+	ServiceDescription *string  `json:"serviceDescription"`
+	Price              *float64 `json:"price"`
+	CustomDuration     int      `json:"customDuration"`
+}
+
 type Shop struct {
 	ShopID     string  `json:"shopID"`
 	ShopName   string  `json:"ShopName"`
