@@ -45,6 +45,14 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AppointmentWeek struct {
+		ApptDate  func(childComplexity int) int
+		ApptID    func(childComplexity int) int
+		BarberID  func(childComplexity int) int
+		EndTime   func(childComplexity int) int
+		StartTime func(childComplexity int) int
+	}
+
 	Client struct {
 		ClientID    func(childComplexity int) int
 		FirstName   func(childComplexity int) int
@@ -65,6 +73,7 @@ type ComplexityRoot struct {
 		Clients      func(childComplexity int) int
 		RefreshToken func(childComplexity int, input model.Oldtoken) int
 		Services     func(childComplexity int) int
+		WeeklyAppt   func(childComplexity int, input model.Shopidentifier) int
 	}
 
 	Response struct {
@@ -102,6 +111,7 @@ type QueryResolver interface {
 	Clients(ctx context.Context) ([]*model.Client, error)
 	Allshops(ctx context.Context) ([]*model.Shop, error)
 	Services(ctx context.Context) ([]*model.Service, error)
+	WeeklyAppt(ctx context.Context, input model.Shopidentifier) ([]*model.AppointmentWeek, error)
 }
 
 type executableSchema struct {
@@ -118,6 +128,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AppointmentWeek.apptDate":
+		if e.complexity.AppointmentWeek.ApptDate == nil {
+			break
+		}
+
+		return e.complexity.AppointmentWeek.ApptDate(childComplexity), true
+
+	case "AppointmentWeek.apptID":
+		if e.complexity.AppointmentWeek.ApptID == nil {
+			break
+		}
+
+		return e.complexity.AppointmentWeek.ApptID(childComplexity), true
+
+	case "AppointmentWeek.barberID":
+		if e.complexity.AppointmentWeek.BarberID == nil {
+			break
+		}
+
+		return e.complexity.AppointmentWeek.BarberID(childComplexity), true
+
+	case "AppointmentWeek.endTime":
+		if e.complexity.AppointmentWeek.EndTime == nil {
+			break
+		}
+
+		return e.complexity.AppointmentWeek.EndTime(childComplexity), true
+
+	case "AppointmentWeek.startTime":
+		if e.complexity.AppointmentWeek.StartTime == nil {
+			break
+		}
+
+		return e.complexity.AppointmentWeek.StartTime(childComplexity), true
 
 	case "Client.clientID":
 		if e.complexity.Client.ClientID == nil {
@@ -224,6 +269,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Services(childComplexity), true
+
+	case "Query.weeklyAppt":
+		if e.complexity.Query.WeeklyAppt == nil {
+			break
+		}
+
+		args, err := ec.field_Query_weeklyAppt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.WeeklyAppt(childComplexity, args["input"].(model.Shopidentifier)), true
 
 	case "Response.token":
 		if e.complexity.Response.Token == nil {
@@ -412,6 +469,7 @@ type Query{
   clients: [Client!]! @isAuthenticated
   allshops: [Shop!]! 
   services: [Service!]!
+  weeklyAppt(input: Shopidentifier!) : [AppointmentWeek!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -425,6 +483,10 @@ input Oldtoken{
 input Login{
   userName: String!
   password: String!
+}
+
+input Shopidentifier{
+  shopID: ID!
 }
 
 
@@ -471,6 +533,14 @@ type Service{
   serviceDescription:   String
   price:                Float
   customDuration:       Int!
+}
+
+type AppointmentWeek{
+  apptID:               ID!
+  barberID:             ID!
+  apptDate:             String!
+  startTime:            String!
+  endTime:              String!
 }
 
 `, BuiltIn: false},
@@ -537,6 +607,20 @@ func (ec *executionContext) field_Query_refreshToken_args(ctx context.Context, r
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_weeklyAppt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Shopidentifier
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNShopidentifier2apiᚋmodelᚐShopidentifier(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -572,6 +656,176 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AppointmentWeek_apptID(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentWeek) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AppointmentWeek",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ApptID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AppointmentWeek_barberID(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentWeek) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AppointmentWeek",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BarberID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AppointmentWeek_apptDate(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentWeek) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AppointmentWeek",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ApptDate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AppointmentWeek_startTime(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentWeek) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AppointmentWeek",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AppointmentWeek_endTime(ctx context.Context, field graphql.CollectedField, obj *model.AppointmentWeek) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AppointmentWeek",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Client_clientID(ctx context.Context, field graphql.CollectedField, obj *model.Client) (ret graphql.Marshaler) {
 	defer func() {
@@ -1062,6 +1316,47 @@ func (ec *executionContext) _Query_services(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.Service)
 	fc.Result = res
 	return ec.marshalNService2ᚕᚖapiᚋmodelᚐServiceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_weeklyAppt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_weeklyAppt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().WeeklyAppt(rctx, args["input"].(model.Shopidentifier))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AppointmentWeek)
+	fc.Result = res
+	return ec.marshalNAppointmentWeek2ᚕᚖapiᚋmodelᚐAppointmentWeekᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2816,6 +3111,24 @@ func (ec *executionContext) unmarshalInputOldtoken(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputShopidentifier(ctx context.Context, obj interface{}) (model.Shopidentifier, error) {
+	var it model.Shopidentifier
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "shopID":
+			var err error
+			it.ShopID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2823,6 +3136,53 @@ func (ec *executionContext) unmarshalInputOldtoken(ctx context.Context, obj inte
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var appointmentWeekImplementors = []string{"AppointmentWeek"}
+
+func (ec *executionContext) _AppointmentWeek(ctx context.Context, sel ast.SelectionSet, obj *model.AppointmentWeek) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, appointmentWeekImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AppointmentWeek")
+		case "apptID":
+			out.Values[i] = ec._AppointmentWeek_apptID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "barberID":
+			out.Values[i] = ec._AppointmentWeek_barberID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "apptDate":
+			out.Values[i] = ec._AppointmentWeek_apptDate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startTime":
+			out.Values[i] = ec._AppointmentWeek_startTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "endTime":
+			out.Values[i] = ec._AppointmentWeek_endTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var clientImplementors = []string{"Client"}
 
@@ -2971,6 +3331,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_services(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "weeklyAppt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_weeklyAppt(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3376,6 +3750,57 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAppointmentWeek2apiᚋmodelᚐAppointmentWeek(ctx context.Context, sel ast.SelectionSet, v model.AppointmentWeek) graphql.Marshaler {
+	return ec._AppointmentWeek(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAppointmentWeek2ᚕᚖapiᚋmodelᚐAppointmentWeekᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AppointmentWeek) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAppointmentWeek2ᚖapiᚋmodelᚐAppointmentWeek(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNAppointmentWeek2ᚖapiᚋmodelᚐAppointmentWeek(ctx context.Context, sel ast.SelectionSet, v *model.AppointmentWeek) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AppointmentWeek(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -3595,6 +4020,10 @@ func (ec *executionContext) marshalNShop2ᚖapiᚋmodelᚐShop(ctx context.Conte
 		return graphql.Null
 	}
 	return ec._Shop(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNShopidentifier2apiᚋmodelᚐShopidentifier(ctx context.Context, v interface{}) (model.Shopidentifier, error) {
+	return ec.unmarshalInputShopidentifier(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

@@ -147,6 +147,38 @@ func (r *queryResolver) Services(ctx context.Context) ([]*model.Service, error) 
 	return services, nil
 }
 
+func (r *queryResolver) WeeklyAppt(ctx context.Context, input model.Shopidentifier) ([]*model.AppointmentWeek, error) {
+	querystring := `select a.apptid, a.barberid, a.apptdate, a.starttime, a.endtime 
+						from appointment a 
+						join 
+						barber b 
+						on a.barberid=b.barberid 
+						where shopid = $1 
+						and apptdate >= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER 
+						and apptdate <= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER+7
+						and a.clientcancelled = false`
+	stmt, err := DB.Prepare(querystring)
+	if dbError(err) {
+		return nil, err
+	}
+	rows, err := stmt.Query(input.ShopID)
+
+	if dbError(err) {
+		return nil, err
+	}
+
+	apptweeks := []*model.AppointmentWeek{}
+	defer rows.Close()
+	for rows.Next() {
+		apptweek := &model.AppointmentWeek{}
+		rows.Scan(&apptweek.ApptID, &apptweek.BarberID, &apptweek.ApptDate,
+			&apptweek.StartTime, &apptweek.EndTime)
+
+		apptweeks = append(apptweeks, apptweek)
+	}
+	return apptweeks, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

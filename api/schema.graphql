@@ -9,6 +9,7 @@ type Query{
   clients: [Client!]! @isAuthenticated
   allshops: [Shop!]! 
   services: [Service!]!
+  weeklyAppt(input: Shopidentifier!) : [AppointmentWeek!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -22,6 +23,10 @@ input Oldtoken{
 input Login{
   userName: String!
   password: String!
+}
+
+input Shopidentifier{
+  shopID: ID!
 }
 
 
@@ -68,5 +73,13 @@ type Service{
   serviceDescription:   String
   price:                Float
   customDuration:       Int!
+}
+
+type AppointmentWeek{
+  apptID:               ID!
+  barberID:             ID!
+  apptDate:             String!
+  startTime:            String!
+  endTime:              String!
 }
 

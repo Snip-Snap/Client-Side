@@ -2,6 +2,14 @@
 
 package model
 
+type AppointmentWeek struct {
+	ApptID    string `json:"apptID"`
+	BarberID  string `json:"barberID"`
+	ApptDate  string `json:"apptDate"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+}
+
 type Client struct {
 	ClientID    string  `json:"clientID"`
 	UserName    string  `json:"userName"`
@@ -53,4 +61,8 @@ type Shop struct {
 	Latitude   string  `json:"Latitude"`
 	Longitude  string  `json:"Longitude"`
 	Rating     float64 `json:"Rating"`
+}
+
+type Shopidentifier struct {
+	ShopID string `json:"shopID"`
 }
