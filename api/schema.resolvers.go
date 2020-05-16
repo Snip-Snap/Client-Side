@@ -9,6 +9,7 @@ import (
 	"api/model"
 	"context"
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -174,6 +175,11 @@ func (r *queryResolver) WeeklyAppt(ctx context.Context, input model.Shopidentifi
 		rows.Scan(&apptweek.ApptID, &apptweek.BarberID, &apptweek.ApptDate,
 			&apptweek.StartTime, &apptweek.EndTime)
 
+		apptweek.ApptDate = strings.Split(apptweek.ApptDate, "T")[0]
+		apptweek.StartTime = strings.Split(apptweek.StartTime, "T")[1]
+		apptweek.StartTime = apptweek.StartTime[:len(apptweek.StartTime)-1]
+		apptweek.EndTime = strings.Split(apptweek.EndTime, "T")[1]
+		apptweek.EndTime = apptweek.EndTime[:len(apptweek.EndTime)-1]
 		apptweeks = append(apptweeks, apptweek)
 	}
 	return apptweeks, nil
