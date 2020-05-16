@@ -155,8 +155,8 @@ func (r *queryResolver) WeeklyAppt(ctx context.Context, input model.Shopidentifi
 						barber b 
 						on a.barberid=b.barberid 
 						where shopid = $1 
-						and apptdate >= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER 
-						and apptdate <= NOW()::DATE-EXTRACT(DOW FROM NOW())::INTEGER+7
+						and apptdate >= NOW()
+						and apptdate <= CURRENT_DATE + integer '7'
 						and a.clientcancelled = false`
 	stmt, err := DB.Prepare(querystring)
 	if dbError(err) {
