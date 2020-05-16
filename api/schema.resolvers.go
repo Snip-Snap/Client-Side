@@ -185,6 +185,30 @@ func (r *queryResolver) WeeklyAppt(ctx context.Context, input model.Shopidentifi
 	return apptweeks, nil
 }
 
+func (r *queryResolver) BarbersAtShop(ctx context.Context, input model.Shopidentifier) ([]*model.AllBarbersAtShop, error) {
+	querystring := `select barberid, firstname, lastname 
+					from barber 
+					where shopid=$1`
+	stmt, err := DB.Prepare(querystring)
+	if dbError(err) {
+		return nil, err
+	}
+	rows, err := stmt.Query(input.ShopID)
+
+	if dbError(err) {
+		return nil, err
+	}
+
+	bsps := []*model.AllBarbersAtShop{}
+	defer rows.Close()
+	for rows.Next() {
+		bsp := &model.AllBarbersAtShop{}
+		rows.Scan(&bsp.BarberID,&bsp.FirstName,&bsp.LastName)
+		bsps = append(bsps, bsp)
+	}
+	return bsps, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

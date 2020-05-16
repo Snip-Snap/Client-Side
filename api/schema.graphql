@@ -10,6 +10,7 @@ type Query{
   allshops: [Shop!]! 
   services: [Service!]!
   weeklyAppt(input: Shopidentifier!) : [AppointmentWeek!]!
+  barbersAtShop(input: Shopidentifier!): [AllBarbersAtShop!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -28,6 +29,7 @@ input Login{
 input Shopidentifier{
   shopID: ID!
 }
+
 
 
 
@@ -83,3 +85,8 @@ type AppointmentWeek{
   endTime:              String!
 }
 
+type AllBarbersAtShop{
+  barberID:             ID!
+  firstName:            String!
+  lastName:             String!
+}

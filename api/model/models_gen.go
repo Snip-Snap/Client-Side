@@ -2,6 +2,12 @@
 
 package model
 
+type AllBarbersAtShop struct {
+	BarberID  string `json:"barberID"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
 type AppointmentWeek struct {
 	ApptID    string `json:"apptID"`
 	BarberID  string `json:"barberID"`
