@@ -44,6 +44,31 @@ type Oldtoken struct {
 	Token string `json:"token"`
 }
 
+type ReceiptData struct {
+	ApptID          string `json:"apptID"`
+	ClientID        string `json:"clientID"`
+	BarberID        string `json:"barberID"`
+	Paymenttype     string `json:"paymenttype"`
+	ApptDate        string `json:"apptDate"`
+	StartTime       string `json:"startTime"`
+	EndTime         string `json:"endTime"`
+	ServiceName     string `json:"serviceName"`
+	Price           string `json:"price"`
+	ShopName        string `json:"shopName"`
+	Shopstreetaddr  string `json:"shopstreetaddr"`
+	ShopCity        string `json:"shopCity"`
+	ShopState       string `json:"shopState"`
+	Barberfirstname string `json:"barberfirstname"`
+	Barberlastname  string `json:"barberlastname"`
+	Clientfirstname string `json:"clientfirstname"`
+	Clientlastname  string `json:"clientlastname"`
+}
+
+type Receiptinput struct {
+	ApptID   string `json:"apptID"`
+	ClientID string `json:"clientID"`
+}
+
 type Response struct {
 	Token string `json:"token"`
 }

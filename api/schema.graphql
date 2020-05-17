@@ -11,6 +11,7 @@ type Query{
   services: [Service!]!
   weeklyAppt(input: Shopidentifier!) : [AppointmentWeek!]!
   barbersAtShop(input: Shopidentifier!): [AllBarbersAtShop!]!
+  receipt(input: Receiptinput!): [ReceiptData!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -30,6 +31,10 @@ input Shopidentifier{
   shopID: ID!
 }
 
+input Receiptinput{
+  apptID:     ID!
+  clientID:   ID!
+}
 
 
 
@@ -89,4 +94,24 @@ type AllBarbersAtShop{
   barberID:             ID!
   firstName:            String!
   lastName:             String!
+}
+
+type ReceiptData{
+  apptID:             ID!
+  clientID:           String!
+  barberID:           String!
+  paymenttype:        String!
+  apptDate:           String!
+  startTime:          String!
+  endTime:            String!
+  serviceName:        String!
+  price:              String!
+  shopName:           String!
+  shopstreetaddr:     String!
+  shopCity:           String!
+  shopState:          String!
+  barberfirstname:    String!
+  barberlastname:     String!
+  clientfirstname:    String!
+  clientlastname:     String!
 }
