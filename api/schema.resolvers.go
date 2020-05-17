@@ -82,7 +82,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 				(clientid, barberid, clientcancelled, paymenttype,
 			 	barbercancelled, apptdate, starttime, endtime ) 
 						VALUES($1, $2, false, 'cash', false, $3, $4, $5) 
-						RETURNING id`
+						RETURNING apptid`
 	err = DB.QueryRow(insertquery, cli_id, input.Barberid,
 		input.Apptdate, input.StartTime, input.EndTime).Scan(&lastInsertId)
 	if dbError(err) {
