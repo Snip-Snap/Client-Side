@@ -62,6 +62,49 @@ func (r *mutationResolver) Login(ctx context.Context, input model.Login) (*model
 	return &model.Response{Token: ""}, fmt.Errorf("Wrong username or password!")
 }
 
+func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (*model.Apptinsert, error) {
+	stmt, err := DB.Prepare("select clientid from client where username=$1")
+	if dbError(err) {
+		return nil, err
+	}
+
+	var cli_id int
+	err = stmt.QueryRow(input.ClientUsername).Scan(&cli_id)
+	if dbError(err) {
+		return nil, err
+	}
+
+	serviceids := strings.Split(input.Servicesids, ",")
+	serviceprice := strings.Split(input.ServicePrice, ",")
+
+	lastInsertId := 0
+	insertquery := `INSERT INTO appointment 
+				(clientid, barberid, clientcancelled, paymenttype,
+			 	barbercancelled, apptdate, starttime, endtime ) 
+						VALUES($1, $2, false, 'cash', false, $3, $4, $5) 
+						RETURNING id`
+	err = DB.QueryRow(insertquery, cli_id, input.Barberid,
+		input.Apptdate, input.StartTime, input.EndTime).Scan(&lastInsertId)
+	if dbError(err) {
+		return nil, err
+	}
+
+	insertquery = `INSERT INTO includes (apptid, serviceid, price) 
+					Values($1, $2, $3)`
+	stmt, err = DB.Prepare(insertquery)
+	if dbError(err) {
+		return nil, err
+	}
+	for index, element := range serviceids {
+		_, err := stmt.Exec(lastInsertId,
+			element, serviceprice[index])
+		if dbError(err) {
+			return nil, err
+		}
+	}
+	return &model.Apptinsert{Okay: "okay"}, nil
+}
+
 func (r *queryResolver) RefreshToken(ctx context.Context, input model.Oldtoken) (*model.Response, error) {
 	username, err := jwtoken.VerifyToken(input.Token)
 	if err != nil {

@@ -3,6 +3,7 @@ type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Response
   login(input: Login!): Response
+  makeAppt(input: ApptData!): Apptinsert
 }
 type Query{
   refreshToken(input: Oldtoken!): Response @isAuthenticated
@@ -42,6 +43,16 @@ input Apptinput{
   clientID:    ID!
 }
 
+input ApptData{
+  barberid:           String!
+  clientUsername:     String!
+  apptdate:           String!
+  startTime:          String!
+  endTime:            String!
+  servicesids:        String!
+  servicePrice:       String!
+}
+
 
 
 input NewClient {
@@ -69,6 +80,10 @@ type Response{
 
 type PdfLink{
   url: String!
+}
+
+type Apptinsert{
+  okay: String!
 }
 
 type Shop{
@@ -125,3 +140,6 @@ type ReceiptData{
   clientfirstname:    String!
   clientlastname:     String!
 }
+
+
+

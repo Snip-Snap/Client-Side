@@ -16,8 +16,22 @@ type AppointmentWeek struct {
 	EndTime   string `json:"endTime"`
 }
 
+type ApptData struct {
+	Barberid       string `json:"barberid"`
+	ClientUsername string `json:"clientUsername"`
+	Apptdate       string `json:"apptdate"`
+	StartTime      string `json:"startTime"`
+	EndTime        string `json:"endTime"`
+	Servicesids    string `json:"servicesids"`
+	ServicePrice   string `json:"servicePrice"`
+}
+
 type Apptinput struct {
 	ClientID string `json:"clientID"`
+}
+
+type Apptinsert struct {
+	Okay string `json:"okay"`
 }
 
 type Client struct {

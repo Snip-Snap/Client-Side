@@ -59,6 +59,10 @@ type ComplexityRoot struct {
 		StartTime func(childComplexity int) int
 	}
 
+	Apptinsert struct {
+		Okay func(childComplexity int) int
+	}
+
 	Client struct {
 		ClientID    func(childComplexity int) int
 		FirstName   func(childComplexity int) int
@@ -71,6 +75,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		Login        func(childComplexity int, input model.Login) int
+		MakeAppt     func(childComplexity int, input model.ApptData) int
 		SignupClient func(childComplexity int, input model.NewClient) int
 	}
 
@@ -139,6 +144,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	SignupClient(ctx context.Context, input model.NewClient) (*model.Response, error)
 	Login(ctx context.Context, input model.Login) (*model.Response, error)
+	MakeAppt(ctx context.Context, input model.ApptData) (*model.Apptinsert, error)
 }
 type QueryResolver interface {
 	RefreshToken(ctx context.Context, input model.Oldtoken) (*model.Response, error)
@@ -223,6 +229,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AppointmentWeek.StartTime(childComplexity), true
 
+	case "Apptinsert.okay":
+		if e.complexity.Apptinsert.Okay == nil {
+			break
+		}
+
+		return e.complexity.Apptinsert.Okay(childComplexity), true
+
 	case "Client.clientID":
 		if e.complexity.Client.ClientID == nil {
 			break
@@ -283,6 +296,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.Login)), true
+
+	case "Mutation.makeAppt":
+		if e.complexity.Mutation.MakeAppt == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_makeAppt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MakeAppt(childComplexity, args["input"].(model.ApptData)), true
 
 	case "Mutation.signupClient":
 		if e.complexity.Mutation.SignupClient == nil {
@@ -696,6 +721,7 @@ type Mutation {
   # Client is return type. Will need to be changed in future. Return hashtoken?
   signupClient(input: NewClient!) : Response
   login(input: Login!): Response
+  makeAppt(input: ApptData!): Apptinsert
 }
 type Query{
   refreshToken(input: Oldtoken!): Response @isAuthenticated
@@ -735,6 +761,16 @@ input Apptinput{
   clientID:    ID!
 }
 
+input ApptData{
+  barberid:           String!
+  clientUsername:     String!
+  apptdate:           String!
+  startTime:          String!
+  endTime:            String!
+  servicesids:        String!
+  servicePrice:       String!
+}
+
 
 
 input NewClient {
@@ -762,6 +798,10 @@ type Response{
 
 type PdfLink{
   url: String!
+}
+
+type Apptinsert{
+  okay: String!
 }
 
 type Shop{
@@ -817,7 +857,11 @@ type ReceiptData{
   barberlastname:     String!
   clientfirstname:    String!
   clientlastname:     String!
-}`, BuiltIn: false},
+}
+
+
+
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -831,6 +875,20 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	var arg0 model.Login
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNLogin2apiᚋmodelᚐLogin(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_makeAppt_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.ApptData
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNApptData2apiᚋmodelᚐApptData(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1259,6 +1317,40 @@ func (ec *executionContext) _AppointmentWeek_endTime(ctx context.Context, field 
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Apptinsert_okay(ctx context.Context, field graphql.CollectedField, obj *model.Apptinsert) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Apptinsert",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Okay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Client_clientID(ctx context.Context, field graphql.CollectedField, obj *model.Client) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1568,6 +1660,44 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	res := resTmp.(*model.Response)
 	fc.Result = res
 	return ec.marshalOResponse2ᚖapiᚋmodelᚐResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_makeAppt(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_makeAppt_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MakeAppt(rctx, args["input"].(model.ApptData))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Apptinsert)
+	fc.Result = res
+	return ec.marshalOApptinsert2ᚖapiᚋmodelᚐApptinsert(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PdfLink_url(ctx context.Context, field graphql.CollectedField, obj *model.PdfLink) (ret graphql.Marshaler) {
@@ -4229,6 +4359,60 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputApptData(ctx context.Context, obj interface{}) (model.ApptData, error) {
+	var it model.ApptData
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "barberid":
+			var err error
+			it.Barberid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clientUsername":
+			var err error
+			it.ClientUsername, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "apptdate":
+			var err error
+			it.Apptdate, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "startTime":
+			var err error
+			it.StartTime, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endTime":
+			var err error
+			it.EndTime, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "servicesids":
+			var err error
+			it.Servicesids, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "servicePrice":
+			var err error
+			it.ServicePrice, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputApptinput(ctx context.Context, obj interface{}) (model.Apptinput, error) {
 	var it model.Apptinput
 	var asMap = obj.(map[string]interface{})
@@ -4471,6 +4655,33 @@ func (ec *executionContext) _AppointmentWeek(ctx context.Context, sel ast.Select
 	return out
 }
 
+var apptinsertImplementors = []string{"Apptinsert"}
+
+func (ec *executionContext) _Apptinsert(ctx context.Context, sel ast.SelectionSet, obj *model.Apptinsert) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, apptinsertImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Apptinsert")
+		case "okay":
+			out.Values[i] = ec._Apptinsert_okay(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var clientImplementors = []string{"Client"}
 
 func (ec *executionContext) _Client(ctx context.Context, sel ast.SelectionSet, obj *model.Client) graphql.Marshaler {
@@ -4544,6 +4755,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec._Mutation_signupClient(ctx, field)
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
+		case "makeAppt":
+			out.Values[i] = ec._Mutation_makeAppt(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5329,6 +5542,10 @@ func (ec *executionContext) marshalNAppointmentWeek2ᚖapiᚋmodelᚐAppointment
 	return ec._AppointmentWeek(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNApptData2apiᚋmodelᚐApptData(ctx context.Context, v interface{}) (model.ApptData, error) {
+	return ec.unmarshalInputApptData(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNApptinput2apiᚋmodelᚐApptinput(ctx context.Context, v interface{}) (model.Apptinput, error) {
 	return ec.unmarshalInputApptinput(ctx, v)
 }
@@ -5865,6 +6082,17 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOApptinsert2apiᚋmodelᚐApptinsert(ctx context.Context, sel ast.SelectionSet, v model.Apptinsert) graphql.Marshaler {
+	return ec._Apptinsert(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOApptinsert2ᚖapiᚋmodelᚐApptinsert(ctx context.Context, sel ast.SelectionSet, v *model.Apptinsert) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Apptinsert(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
