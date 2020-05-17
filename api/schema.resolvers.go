@@ -99,6 +99,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 		fmt.Println(serviceprice[index])
 		_, err := stmt.Exec(lastInsertId,
 			element, serviceprice[index])
+		fmt.Println(err)
 		if dbError(err) {
 			return nil, err
 		}
