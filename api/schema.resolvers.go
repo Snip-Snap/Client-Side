@@ -98,7 +98,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 	}
 	for index, element := range serviceids {
 
-		p, err := strconv.Atoi(serviceprice[index])
+		p, err := strconv.ParseFloat(serviceprice[index], 32)
 		fmt.Println(p)
 		_, err = stmt.Exec(lastInsertId,
 			element, p)
