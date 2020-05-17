@@ -76,7 +76,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 
 	serviceids := strings.Split(input.Servicesids, ",")
 	serviceprice := strings.Split(input.ServicePrice, ",")
-
+	fmt.Println(serviceprice)
 	lastInsertId := 0
 	insertquery := `INSERT INTO appointment 
 				(clientid, barberid, clientcancelled, paymenttype,
@@ -96,6 +96,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 		return nil, err
 	}
 	for index, element := range serviceids {
+		fmt.Println(serviceprice)
 		_, err := stmt.Exec(lastInsertId,
 			element, serviceprice[index])
 		if dbError(err) {
