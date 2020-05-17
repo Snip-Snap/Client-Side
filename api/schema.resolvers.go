@@ -307,14 +307,14 @@ func (r *queryResolver) PastapptbyClient(ctx context.Context, input model.Apptin
 		select a.apptid, a.clientid, a.barberid, a.paymenttype,
 		 a.apptdate, a.starttime, a.endtime, s.servicename, 
 		 inc.price from appointment a natural join includes 
-		 inc join service s on inc.serviceid=s.serviceid where a.clientid = $1
+		 inc join service s on inc.serviceid=s.serviceid where a.clientid = 26
 	 )
 	 select ad.*, s.shopname, s.streetaddr, s.city, s.state, 
 	 b.firstname as barberfirst, b.lastname as barberlast,
 	  c.firstname, c.lastname from 
 	  shop s join barber b on s.shopid=b.shopid 
 	  join appt_dets ad on b.barberid=ad.barberid 
-	  join client c on c.clientid=ad.clientid where ad.apptdate < NOW();`
+	  join client c on c.clientid=ad.clientid`
 	stmt, err := DB.Prepare(querystring)
 	if dbError(err) {
 		return nil, err

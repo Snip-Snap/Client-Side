@@ -175,7 +175,7 @@ func Receipt(rdata []*model.ReceiptData) string {
 
 	})
 
-	err := m.OutputFileAndClose("./billing.pdf")
+	err := m.OutputFileAndClose("./" + rdata[0].ApptID + ".pdf")
 	if err != nil {
 		fmt.Println("Could not save PDF:", err)
 		os.Exit(1)
