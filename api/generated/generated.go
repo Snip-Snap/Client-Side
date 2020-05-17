@@ -60,6 +60,7 @@ type ComplexityRoot struct {
 	}
 
 	Apptinsert struct {
+		ID   func(childComplexity int) int
 		Okay func(childComplexity int) int
 	}
 
@@ -228,6 +229,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AppointmentWeek.StartTime(childComplexity), true
+
+	case "Apptinsert.id":
+		if e.complexity.Apptinsert.ID == nil {
+			break
+		}
+
+		return e.complexity.Apptinsert.ID(childComplexity), true
 
 	case "Apptinsert.okay":
 		if e.complexity.Apptinsert.Okay == nil {
@@ -802,6 +810,7 @@ type PdfLink{
 
 type Apptinsert{
   okay: String!
+  id:   String!
 }
 
 type Shop{
@@ -1335,6 +1344,40 @@ func (ec *executionContext) _Apptinsert_okay(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Okay, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Apptinsert_id(ctx context.Context, field graphql.CollectedField, obj *model.Apptinsert) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Apptinsert",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4668,6 +4711,11 @@ func (ec *executionContext) _Apptinsert(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = graphql.MarshalString("Apptinsert")
 		case "okay":
 			out.Values[i] = ec._Apptinsert_okay(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "id":
+			out.Values[i] = ec._Apptinsert_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

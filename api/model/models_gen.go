@@ -32,6 +32,7 @@ type Apptinput struct {
 
 type Apptinsert struct {
 	Okay string `json:"okay"`
+	ID   string `json:"id"`
 }
 
 type Client struct {

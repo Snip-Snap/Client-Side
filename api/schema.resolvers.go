@@ -10,6 +10,7 @@ import (
 	"api/pdf"
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -104,7 +105,7 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 			return nil, err
 		}
 	}
-	return &model.Apptinsert{Okay: "okay"}, nil
+	return &model.Apptinsert{Okay: "okay", ID: strconv.Itoa(lastInsertId)}, nil
 }
 
 func (r *queryResolver) RefreshToken(ctx context.Context, input model.Oldtoken) (*model.Response, error) {

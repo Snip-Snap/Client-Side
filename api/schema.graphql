@@ -84,6 +84,7 @@ type PdfLink{
 
 type Apptinsert{
   okay: String!
+  id:   String!
 }
 
 type Shop{
