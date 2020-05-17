@@ -10,7 +10,6 @@ import (
 	"api/pdf"
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -98,14 +97,9 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 	}
 	for index, element := range serviceids {
 
-		p, err := strconv.ParseFloat(serviceprice[index], 32)
-		fmt.Println(p)
-
 		_, err = stmt.Exec(lastInsertId,
-			element, p)
-		fmt.Println(element)
+			element, serviceprice[index])
 
-		fmt.Println(err)
 		if dbError(err) {
 			return nil, err
 		}
