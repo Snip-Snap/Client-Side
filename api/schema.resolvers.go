@@ -100,8 +100,11 @@ func (r *mutationResolver) MakeAppt(ctx context.Context, input model.ApptData) (
 
 		p, err := strconv.ParseFloat(serviceprice[index], 32)
 		fmt.Println(p)
+
 		_, err = stmt.Exec(lastInsertId,
 			element, p)
+		fmt.Println(element)
+
 		fmt.Println(err)
 		if dbError(err) {
 			return nil, err
