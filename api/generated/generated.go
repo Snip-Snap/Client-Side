@@ -74,14 +74,20 @@ type ComplexityRoot struct {
 		SignupClient func(childComplexity int, input model.NewClient) int
 	}
 
+	PdfLink struct {
+		URL func(childComplexity int) int
+	}
+
 	Query struct {
-		Allshops      func(childComplexity int) int
-		BarbersAtShop func(childComplexity int, input model.Shopidentifier) int
-		Clients       func(childComplexity int) int
-		Receipt       func(childComplexity int, input model.Receiptinput) int
-		RefreshToken  func(childComplexity int, input model.Oldtoken) int
-		Services      func(childComplexity int) int
-		WeeklyAppt    func(childComplexity int, input model.Shopidentifier) int
+		Allshops         func(childComplexity int) int
+		BarbersAtShop    func(childComplexity int, input model.Shopidentifier) int
+		Clients          func(childComplexity int) int
+		NewapptbyClient  func(childComplexity int, input model.Apptinput) int
+		PastapptbyClient func(childComplexity int, input model.Apptinput) int
+		Receipt          func(childComplexity int, input model.Receiptinput) int
+		RefreshToken     func(childComplexity int, input model.Oldtoken) int
+		Services         func(childComplexity int) int
+		WeeklyAppt       func(childComplexity int, input model.Shopidentifier) int
 	}
 
 	ReceiptData struct {
@@ -141,7 +147,9 @@ type QueryResolver interface {
 	Services(ctx context.Context) ([]*model.Service, error)
 	WeeklyAppt(ctx context.Context, input model.Shopidentifier) ([]*model.AppointmentWeek, error)
 	BarbersAtShop(ctx context.Context, input model.Shopidentifier) ([]*model.AllBarbersAtShop, error)
-	Receipt(ctx context.Context, input model.Receiptinput) ([]*model.ReceiptData, error)
+	Receipt(ctx context.Context, input model.Receiptinput) (*model.PdfLink, error)
+	PastapptbyClient(ctx context.Context, input model.Apptinput) ([]*model.ReceiptData, error)
+	NewapptbyClient(ctx context.Context, input model.Apptinput) ([]*model.ReceiptData, error)
 }
 
 type executableSchema struct {
@@ -288,6 +296,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SignupClient(childComplexity, args["input"].(model.NewClient)), true
 
+	case "PdfLink.url":
+		if e.complexity.PdfLink.URL == nil {
+			break
+		}
+
+		return e.complexity.PdfLink.URL(childComplexity), true
+
 	case "Query.allshops":
 		if e.complexity.Query.Allshops == nil {
 			break
@@ -313,6 +328,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Clients(childComplexity), true
+
+	case "Query.newapptbyClient":
+		if e.complexity.Query.NewapptbyClient == nil {
+			break
+		}
+
+		args, err := ec.field_Query_newapptbyClient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.NewapptbyClient(childComplexity, args["input"].(model.Apptinput)), true
+
+	case "Query.pastapptbyClient":
+		if e.complexity.Query.PastapptbyClient == nil {
+			break
+		}
+
+		args, err := ec.field_Query_pastapptbyClient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.PastapptbyClient(childComplexity, args["input"].(model.Apptinput)), true
 
 	case "Query.receipt":
 		if e.complexity.Query.Receipt == nil {
@@ -665,7 +704,9 @@ type Query{
   services: [Service!]!
   weeklyAppt(input: Shopidentifier!) : [AppointmentWeek!]!
   barbersAtShop(input: Shopidentifier!): [AllBarbersAtShop!]!
-  receipt(input: Receiptinput!): [ReceiptData!]!
+  receipt(input: Receiptinput!): PdfLink!
+  pastapptbyClient(input: Apptinput!) : [ReceiptData!]!
+  newapptbyClient(input: Apptinput!): [ReceiptData!]!
 }
 
 directive @isAuthenticated on FIELD_DEFINITION
@@ -688,6 +729,10 @@ input Shopidentifier{
 input Receiptinput{
   apptID:     ID!
   clientID:   ID!
+}
+
+input Apptinput{
+  clientID:    ID!
 }
 
 
@@ -713,6 +758,10 @@ type Client {
 
 type Response{
   token: String!
+}
+
+type PdfLink{
+  url: String!
 }
 
 type Shop{
@@ -824,6 +873,34 @@ func (ec *executionContext) field_Query_barbersAtShop_args(ctx context.Context, 
 	var arg0 model.Shopidentifier
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNShopidentifier2apiᚋmodelᚐShopidentifier(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_newapptbyClient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Apptinput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNApptinput2apiᚋmodelᚐApptinput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_pastapptbyClient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.Apptinput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNApptinput2apiᚋmodelᚐApptinput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1493,6 +1570,40 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	return ec.marshalOResponse2ᚖapiᚋmodelᚐResponse(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PdfLink_url(ctx context.Context, field graphql.CollectedField, obj *model.PdfLink) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "PdfLink",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_refreshToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1780,6 +1891,88 @@ func (ec *executionContext) _Query_receipt(ctx context.Context, field graphql.Co
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Receipt(rctx, args["input"].(model.Receiptinput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PdfLink)
+	fc.Result = res
+	return ec.marshalNPdfLink2ᚖapiᚋmodelᚐPdfLink(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_pastapptbyClient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_pastapptbyClient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().PastapptbyClient(rctx, args["input"].(model.Apptinput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ReceiptData)
+	fc.Result = res
+	return ec.marshalNReceiptData2ᚕᚖapiᚋmodelᚐReceiptDataᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_newapptbyClient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_newapptbyClient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().NewapptbyClient(rctx, args["input"].(model.Apptinput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4036,6 +4229,24 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputApptinput(ctx context.Context, obj interface{}) (model.Apptinput, error) {
+	var it model.Apptinput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "clientID":
+			var err error
+			it.ClientID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLogin(ctx context.Context, obj interface{}) (model.Login, error) {
 	var it model.Login
 	var asMap = obj.(map[string]interface{})
@@ -4344,6 +4555,33 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var pdfLinkImplementors = []string{"PdfLink"}
+
+func (ec *executionContext) _PdfLink(ctx context.Context, sel ast.SelectionSet, obj *model.PdfLink) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pdfLinkImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PdfLink")
+		case "url":
+			out.Values[i] = ec._PdfLink_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -4449,6 +4687,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_receipt(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "pastapptbyClient":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_pastapptbyClient(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "newapptbyClient":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_newapptbyClient(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5063,6 +5329,10 @@ func (ec *executionContext) marshalNAppointmentWeek2ᚖapiᚋmodelᚐAppointment
 	return ec._AppointmentWeek(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNApptinput2apiᚋmodelᚐApptinput(ctx context.Context, v interface{}) (model.Apptinput, error) {
+	return ec.unmarshalInputApptinput(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -5180,6 +5450,20 @@ func (ec *executionContext) unmarshalNNewClient2apiᚋmodelᚐNewClient(ctx cont
 
 func (ec *executionContext) unmarshalNOldtoken2apiᚋmodelᚐOldtoken(ctx context.Context, v interface{}) (model.Oldtoken, error) {
 	return ec.unmarshalInputOldtoken(ctx, v)
+}
+
+func (ec *executionContext) marshalNPdfLink2apiᚋmodelᚐPdfLink(ctx context.Context, sel ast.SelectionSet, v model.PdfLink) graphql.Marshaler {
+	return ec._PdfLink(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPdfLink2ᚖapiᚋmodelᚐPdfLink(ctx context.Context, sel ast.SelectionSet, v *model.PdfLink) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PdfLink(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNReceiptData2apiᚋmodelᚐReceiptData(ctx context.Context, sel ast.SelectionSet, v model.ReceiptData) graphql.Marshaler {

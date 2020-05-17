@@ -211,7 +211,7 @@ func (r *queryResolver) BarbersAtShop(ctx context.Context, input model.Shopident
 	return bsps, nil
 }
 
-func (r *queryResolver) Receipt(ctx context.Context, input model.Receiptinput) ([]*model.ReceiptData, error) {
+func (r *queryResolver) Receipt(ctx context.Context, input model.Receiptinput) (*model.PdfLink, error) {
 	querystring := ` with appt_dets as (
 		select a.apptid, a.clientid, a.barberid, a.paymenttype,
 		 a.apptdate, a.starttime, a.endtime, s.servicename, 
@@ -251,8 +251,95 @@ func (r *queryResolver) Receipt(ctx context.Context, input model.Receiptinput) (
 		bsp.EndTime = bsp.EndTime[:len(bsp.EndTime)-1]
 		bsps = append(bsps, bsp)
 	}
-	pdf.Receipt(bsps)
+	urlpdf := pdf.Receipt(bsps)
+	ret := &model.PdfLink{}
+	ret.URL = urlpdf
+	return ret, nil
+}
 
+func (r *queryResolver) PastapptbyClient(ctx context.Context, input model.Apptinput) ([]*model.ReceiptData, error) {
+	querystring := ` with appt_dets as (
+		select a.apptid, a.clientid, a.barberid, a.paymenttype,
+		 a.apptdate, a.starttime, a.endtime, s.servicename, 
+		 inc.price from appointment a natural join includes 
+		 inc join service s on inc.serviceid=s.serviceid where a.clientid = $1
+	 )
+	 select ad.*, s.shopname, s.streetaddr, s.city, s.state, 
+	 b.firstname as barberfirst, b.lastname as barberlast,
+	  c.firstname, c.lastname from 
+	  shop s join barber b on s.shopid=b.shopid 
+	  join appt_dets ad on b.barberid=ad.barberid 
+	  join client c on c.clientid=ad.clientid where ad.apptdate < NOW();`
+	stmt, err := DB.Prepare(querystring)
+	if dbError(err) {
+		return nil, err
+	}
+	rows, err := stmt.Query(input.ClientID)
+
+	if dbError(err) {
+		return nil, err
+	}
+
+	bsps := []*model.ReceiptData{}
+	defer rows.Close()
+	for rows.Next() {
+		bsp := &model.ReceiptData{}
+		rows.Scan(&bsp.ApptID, &bsp.ClientID, &bsp.BarberID, &bsp.Paymenttype,
+			&bsp.ApptDate, &bsp.StartTime, &bsp.EndTime, &bsp.ServiceName,
+			&bsp.Price, &bsp.ShopName, &bsp.Shopstreetaddr, &bsp.ShopCity,
+			&bsp.ShopState, &bsp.Barberfirstname, &bsp.Barberlastname,
+			&bsp.Clientfirstname, &bsp.Clientlastname)
+
+		bsp.ApptDate = strings.Split(bsp.ApptDate, "T")[0]
+		bsp.StartTime = strings.Split(bsp.StartTime, "T")[1]
+		bsp.StartTime = bsp.StartTime[:len(bsp.StartTime)-1]
+		bsp.EndTime = strings.Split(bsp.EndTime, "T")[1]
+		bsp.EndTime = bsp.EndTime[:len(bsp.EndTime)-1]
+		bsps = append(bsps, bsp)
+	}
+	return bsps, nil
+}
+
+func (r *queryResolver) NewapptbyClient(ctx context.Context, input model.Apptinput) ([]*model.ReceiptData, error) {
+	querystring := ` with appt_dets as (
+		select a.apptid, a.clientid, a.barberid, a.paymenttype,
+		 a.apptdate, a.starttime, a.endtime, s.servicename, 
+		 inc.price from appointment a natural join includes 
+		 inc join service s on inc.serviceid=s.serviceid where a.clientid = $1
+	 )
+	 select ad.*, s.shopname, s.streetaddr, s.city, s.state, 
+	 b.firstname as barberfirst, b.lastname as barberlast,
+	  c.firstname, c.lastname from 
+	  shop s join barber b on s.shopid=b.shopid 
+	  join appt_dets ad on b.barberid=ad.barberid 
+	  join client c on c.clientid=ad.clientid where ad.apptdate >= NOW();`
+	stmt, err := DB.Prepare(querystring)
+	if dbError(err) {
+		return nil, err
+	}
+	rows, err := stmt.Query(input.ClientID)
+
+	if dbError(err) {
+		return nil, err
+	}
+
+	bsps := []*model.ReceiptData{}
+	defer rows.Close()
+	for rows.Next() {
+		bsp := &model.ReceiptData{}
+		rows.Scan(&bsp.ApptID, &bsp.ClientID, &bsp.BarberID, &bsp.Paymenttype,
+			&bsp.ApptDate, &bsp.StartTime, &bsp.EndTime, &bsp.ServiceName,
+			&bsp.Price, &bsp.ShopName, &bsp.Shopstreetaddr, &bsp.ShopCity,
+			&bsp.ShopState, &bsp.Barberfirstname, &bsp.Barberlastname,
+			&bsp.Clientfirstname, &bsp.Clientlastname)
+
+		bsp.ApptDate = strings.Split(bsp.ApptDate, "T")[0]
+		bsp.StartTime = strings.Split(bsp.StartTime, "T")[1]
+		bsp.StartTime = bsp.StartTime[:len(bsp.StartTime)-1]
+		bsp.EndTime = strings.Split(bsp.EndTime, "T")[1]
+		bsp.EndTime = bsp.EndTime[:len(bsp.EndTime)-1]
+		bsps = append(bsps, bsp)
+	}
 	return bsps, nil
 }
 

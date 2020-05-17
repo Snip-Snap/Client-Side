@@ -16,6 +16,10 @@ type AppointmentWeek struct {
 	EndTime   string `json:"endTime"`
 }
 
+type Apptinput struct {
+	ClientID string `json:"clientID"`
+}
+
 type Client struct {
 	ClientID    string  `json:"clientID"`
 	UserName    string  `json:"userName"`
@@ -42,6 +46,10 @@ type NewClient struct {
 
 type Oldtoken struct {
 	Token string `json:"token"`
+}
+
+type PdfLink struct {
+	URL string `json:"url"`
 }
 
 type ReceiptData struct {
