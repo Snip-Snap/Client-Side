@@ -1,5 +1,10 @@
 FROM golang:1.14.2-alpine3.11
 
+RUN apk --no-cache update && \
+    apk --no-cache add python py-pip py-setuptools && \
+    pip --no-cache-dir install awscli && \
+    rm -rf /var/cache/apk/*
+
 #create a file
 RUN mkdir /app
 
